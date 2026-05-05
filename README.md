@@ -2,6 +2,7 @@
 An event-driven automated security orchestration tool that detects unauthorized AWS API activity and blocks source IPs at the VPC Network ACL level.
 PREREQUSITES: An AWS account, AWS CloudTrail enabled, a VPC with a public subnet
 
+
 ARCHITECTURE -------------------------------------
 
 Logging: AWS CloudTrail
@@ -9,13 +10,16 @@ Monitoring: AWS CloudTrail Log Groups + Subscription Filters
 Compute: AWS Lambda - Python 3.14
 Remediation: VPC Network ACLs 
 
+
 FEATURES -------------------------------------
 
 Point-of-Impact Blocking: Uses stateless NACL rules for immediate traffic dropping
 Safety Switch: Integrated logic to prevent blocking of administrative IPs
 IPv4 & IPv6 support
 
+
 INSTALLATION -------------------------------------
+
 
 Deploying the software -----------------
 By default, CloudTrail only logs to S3 buckets. We need CloudTrail to stream to CloudWatch for real-time responses.
@@ -32,7 +36,10 @@ By default, CloudTrail only logs to S3 buckets. We need CloudTrail to stream to 
 
  Then, Lambda function is deployed under the new IAM Role. Paste the code from this repo into the lambda code editor and update the variables for your NACL ID and administrative IP address. Click deploy. 
 
+
  Grant IAM permissions to Lambda -----------------
+
+ 
  Lambda needs authority to modify netwokk settings, we grant that in this step. 
 
  In the Lambda console, click Configuration > Permissions > Role Name (you created this in a previous step) 
@@ -43,7 +50,9 @@ By default, CloudTrail only logs to S3 buckets. We need CloudTrail to stream to 
 
  Review the code and save as a relevant name you will remember. 
 
+
  Attach the CloudWatch trigger -----------------
+ 
 
  Go to CloudWatch > Log Groups
 
@@ -57,7 +66,9 @@ By default, CloudTrail only logs to S3 buckets. We need CloudTrail to stream to 
 
  Name the filter something relevant and click start streaming. 
 
+
  TESTING AND ADVISORIES -------------------------------------
+
 
  To test, log onto AWS from a different network (one you don't mind being banned on such as a mobile hotspot) and attempt a forbidden action for your user, such as creating an S3 bucket. 
  Access should be denied, and if you check your NACL, you should see a ban rule for the IP address you used. 
