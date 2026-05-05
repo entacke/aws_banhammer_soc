@@ -1,0 +1,53 @@
+import boto3
+import base64
+import gzip
+import json
+
+ec2 = boto3.client('ec2')
+
+def lambda_handler(event, context):
+    # Unzip the data from CloudWatch
+    cw_data = event['awslogs']['data']
+    compressed_payload = base64.b64decode(cw_data)
+    uncompressed_payload = gzip.decompress(compressed_payload)
+    payload = json.loads(uncompressed_payload)
+
+    # Find the IP in the logs
+    for log_event in payload['logEvents']:
+        log_json = json.loads(log_event['message'])
+        attacker_ip = log_json.get('sourceIPAddress')
+        
+        if attacker_ip:
+            print(f"ATTACK DETECTED FROM: {attacker_ip}")
+            
+            # Safety Switch
+            MY_IP = "xxxxxxxxxxxxxxxxxxxxx" # Your IP address here
+
+            if attacker_ip == MY_IP:
+                print("Safety Triggered: Detected an error from my own IP. Skipping ban.")
+                continue 
+
+            # Apply the Ban 
+            try:
+                is_ipv6 = ":" in attacker_ip
+                
+                params = {
+                    'NetworkAclId': 'acl-xxxxxxxxxxxxxxxxxx', # Your ACL ID
+                    'RuleNumber': 5,
+                    'Protocol': '-1',
+                    'RuleAction': 'deny',
+                    'Egress': False
+                }
+                
+                if is_ipv6:
+                    params['Ipv6CidrBlock'] = f"{attacker_ip}/128"
+                else:
+                    params['CidrBlock'] = f"{attacker_ip}/32"
+
+                ec2.create_network_acl_entry(**params)
+                print(f"SUCCESS: {attacker_ip} has been banned.")
+                
+            except Exception as e:
+                print(f"ERROR: Could not ban {attacker_ip}. Error: {e}")
+
+    return {"status": "Complete"}
