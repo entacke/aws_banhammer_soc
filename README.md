@@ -41,5 +41,30 @@ By default, CloudTrail only logs to S3 buckets. We need CloudTrail to stream to 
 
  Select JSON and paste the code from the Lambda permissions document in this repo. 
 
+ Review the code and save as a relevant name you will remember. 
+
+ Attach the CloudWatch trigger -----------------
+
+ Go to CloudWatch > Log Groups
+
+ Select the aws-cloudtrail-logs group.
+
+ Click Actions > Subscription filters > Create Lambda subscription filter.
+
+ Select the Lambda function that you created in a previous step. 
+
+ For the log format, select JSON, and use this subscription filter pattern: { $.errorCode = "AccessDenied" }
+
+ Name the filter something relevant and click start streaming. 
+
+ TESTING AND ADVISORIES -------------------------------------
+
+ To test, log onto AWS from a different network (one you don't mind being banned on such as a mobile hotspot) and attempt a forbidden action for your user, such as creating an S3 bucket. 
+ Access should be denied, and if you check your NACL, you should see a ban rule for the IP address you used. 
+
+ CAUTION: This tool is designed to be highly aggressive, so please ensure you have your correct IP address in the safety switch section of the banhammer code.
+ 
+
+
  
  
