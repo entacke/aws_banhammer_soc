@@ -22,6 +22,7 @@ INSTALLATION -------------------------------------
 
 
 Deploying the software -----------------
+
 By default, CloudTrail only logs to S3 buckets. We need CloudTrail to stream to CloudWatch for real-time responses.
 
  Navigate to the CloudTrail Console > Trails.
